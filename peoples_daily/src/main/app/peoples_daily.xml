@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:responsemodule="http://www.mulesoft.org/schema/mule/responsemodule" xmlns:openerp="http://www.mulesoft.org/schema/mule/openerp" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:mcdatamapper="http://www.mulesoft.org/schema/mule/mcdatamapper" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/openerp http://www.mulesoft.org/schema/mule/openerp/1.0-SNAPSHOT/mule-openerp.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/responsemodule http://www.mulesoft.org/schema/mule/responsemodule/1.0-SNAPSHOT/mule-responsemodule.xsd
+http://www.mulesoft.org/schema/mule/mcdatamapper http://www.mulesoft.org/schema/mule/mcdatamapper/1.0-SNAPSHOT/mule-mcdatamapper.xsd">
+    <openerp:config name="Openerp" username="admin" password="123" address="115.28.1.69" port="8069" db="rm_demo" doc:name="Openerp">
+        <openerp:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
+    </openerp:config>
+    <responsemodule:config name="Responsemodule" doc:name="Responsemodule"/>
+    <mcdatamapper:config name="Mcdatamapper" doc:name="Mcdatamapper"/>
+    <choice-exception-strategy name="Choice_Exception_Strategy">
+        <catch-exception-strategy doc:name="General Exception [code=-1]">
+            <responsemodule:to-error config-ref="Responsemodule" code="-1" message="Internal Server Exception" doc:name="Responsemodule"/>
+        </catch-exception-strategy>
+    </choice-exception-strategy>
+    <catch-exception-strategy when="exception.causedBy(org.apache.xmlrpc.XmlRpcException)" name="XML_PRC_Exception">
+        <custom-transformer class="com.mobilitychina.peoplesdaily.esb.transformer.ToParseXmlPpcException" doc:name="Java"/>
+        <responsemodule:to-error config-ref="Responsemodule" code="#[payload[&quot;code&quot;]]" message="#[payload[&quot;message&quot;]]" doc:name="Responsemodule"/>
+    </catch-exception-strategy>
+    <flow name="main" doc:name="main">
+        <http:inbound-endpoint exchange-pattern="request-response" host="0.0.0.0" port="8092" doc:name="HTTP"/>
+        <object-to-string-transformer doc:name="Object to String"/>
+        <logger level="INFO" doc:name="Logger"/>
+        <component class="com.mobilitychina.peoplesdaily.esb.component.ParseRequest" doc:name="Java"/>
+        <enricher source="#[payload]" target="#[message.outboundProperties['auth_result']]" doc:name="Message Enricher">
+            <flow-ref name="flow_auth" doc:name="Flow Reference"/>
+        </enricher>
+        <choice doc:name="Choice">
+            <when expression="#[message.outboundProperties['auth_result']==true]">
+                <choice doc:name="Choice">
+                    <when expression="#[message.inboundProperties['http.relative.path'] == 'login']">
+                        <responsemodule:to-success-string config-ref="Responsemodule" message="OK" data="#[payload]" doc:name="login"/>
+                    </when>
+                    <when expression="#[message.inboundProperties['http.relative.path'] == 'getallorderline']">
+                        <flow-ref name="get_all_orderline" doc:name="get all orderline"/>
+                    </when>
+                    <when expression="#[message.inboundProperties['http.relative.path'] == 'getinfobylineid']">
+                        <flow-ref name="get_info_by_lineid" doc:name="get info by lineid"/>
+                    </when>
+                    <when expression="#[message.inboundProperties['http.relative.path'] == 'updateorderline']">
+                        <flow-ref name="update_orderline" doc:name="update orderline"/>
+                    </when>
+                    <when expression="#[message.inboundProperties['http.relative.path'] == 'debug_point']">
+                        <flow-ref name="debug_point" doc:name="debug point"/>
+                    </when>
+                    <when expression="#[message.inboundProperties['http.relative.path'] == 'get_draft_saleorder']">
+                        <flow-ref name="get_draft_saleorder" doc:name="get draft saleorder"/>
+                    </when>
+                    <when expression="#[message.inboundProperties['http.relative.path'] == 'get_draft_saleorderline']">
+                        <flow-ref name="get_draft_saleorderline" doc:name="get draft saleorderline"/>
+                    </when>
+                    <when expression="#[message.inboundProperties['http.relative.path'] == 'get_images_from_db']">
+                        <flow-ref name="get_images_from_db" doc:name="get images from db"/>
+                    </when>
+                    <when expression="#[message.inboundProperties['http.relative.path'] == 'update_orderline_new']">
+                        <flow-ref name="update_orderline_new" doc:name="update orderline new"/>
+                    </when>
+                    <when expression="#[message.inboundProperties['http.relative.path'] == 'create_orderline']">
+                        <flow-ref name="create_orderline" doc:name="create orderline"/>
+                    </when>
+                    <otherwise>
+                        <responsemodule:to-error config-ref="Responsemodule"  doc:name="No such method" code="-3" message="No such method"/>
+                    </otherwise>
+                </choice>
+            </when>
+            <otherwise>
+                <responsemodule:to-error config-ref="Responsemodule" code="-2" message="username or password incorrect" doc:name="username or password incorrect"/>
+            </otherwise>
+        </choice>
+    </flow>
+    <sub-flow name="flow_auth" doc:name="flow_auth">
+        <openerp:oe-login config-ref="Openerp" pwd="#[message.outboundProperties['auth_password']]" user="#[message.outboundProperties['auth_name']]" doc:name="Openerp"/>
+    </sub-flow>
+    <sub-flow name="get_all_orderline" doc:name="get_all_orderline">
+        <mcdatamapper:mapping config-ref="Mcdatamapper" inputAsJSON="true" rule="{type:&quot;raw&quot;}" doc:name="Mcdatamapper"/>
+        <openerp:oe-execute config-ref="Openerp" jsonArrayParam="[]" method="get_all_orderline" model="rm.nationalcenter" username="#[message.outboundProperties['auth_name']]" password="#[message.outboundProperties['auth_password']]" doc:name="Openerp"/>
+        <mcdatamapper:mapping config-ref="Mcdatamapper" outputAsJson="true" rule="{type: &quot;raw&quot;}" doc:name="Mcdatamapper"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <responsemodule:to-success-json-array config-ref="Responsemodule" message="OK" data="#[payload]" doc:name="Responsemodule"/>
+    </sub-flow>
+    <sub-flow name="get_draft_saleorder" doc:name="get_draft_saleorder">
+        <mcdatamapper:mapping config-ref="Mcdatamapper" inputAsJSON="true" rule="{type:&quot;raw&quot;}" doc:name="Mcdatamapper"/>
+        <openerp:oe-search2 config-ref="Openerp" model="sale.order" jsonExpr="[['state','=','draft']]" doc:name="Openerp" password="#[message.outboundProperties['auth_password']]" username="#[message.outboundProperties['auth_name']]"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <openerp:oe-read config-ref="Openerp"   model="sale.order" doc:name="Openerp" password="#[message.outboundProperties['auth_password']]" username="#[message.outboundProperties['auth_name']]">
+            <openerp:ids ref="#[payload]"/>
+            <openerp:fields>
+                <openerp:field>installation deadline</openerp:field>
+                <openerp:field>client_order_ref</openerp:field>
+                <openerp:field>channel_one</openerp:field>
+                <openerp:field>channel_two</openerp:field>
+                <openerp:field>name</openerp:field>
+                <openerp:field>order_line</openerp:field>
+                <openerp:field>contract modification</openerp:field>
+                <openerp:field>shop_id</openerp:field>
+                <openerp:field>channel level</openerp:field>
+                <openerp:field>channeltype</openerp:field>
+                <openerp:field>date_order</openerp:field>
+                <openerp:field>state</openerp:field>
+                <openerp:field>partner_shipping_id</openerp:field>
+                <openerp:field>building floors</openerp:field>
+                <openerp:field>channel_three</openerp:field>
+                <openerp:field>partner_invoice_id</openerp:field>
+                <openerp:field>partner_id</openerp:field>
+                <openerp:field>id</openerp:field>
+                <openerp:field>contract periods</openerp:field>
+                <!-- <openerp:field>explored</openerp:field> -->
+                <!-- <openerp:field>quantity</openerp:field> -->
+            </openerp:fields>
+        </openerp:oe-read>
+        <mcdatamapper:mapping config-ref="Mcdatamapper" outputAsJson="true" rule="{type:&quot;raw&quot;}" doc:name="Mcdatamapper"/>
+        <logger level="INFO" doc:name="Logger" message="#[payload]"/>
+        <choice doc:name="Choice">
+            <when expression="&quot;#[payload]&quot; != &quot;&quot;">
+                <responsemodule:to-success-json-array config-ref="Responsemodule" message="OK" data="#[payload]" doc:name="Responsemodule"/>
+            </when>
+            <otherwise>
+                <responsemodule:to-success-null config-ref="Responsemodule" message="&quot;&quot;" doc:name="Responsemodule"/>
+            </otherwise>
+        </choice>
+    </sub-flow>
+    <sub-flow name="get_draft_saleorderline" doc:name="get_draft_saleorderline">
+        <mcdatamapper:mapping config-ref="Mcdatamapper" inputAsJSON="true" rule="{type:&quot;raw&quot;}" doc:name="Mcdatamapper"/>
+        <openerp:oe-search2 config-ref="Openerp" model="sale.order.line" jsonExpr="[
+['order_id','=',#[payload.order_id]]
+]" doc:name="Openerp"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <openerp:oe-read config-ref="Openerp" model="sale.order.line" doc:name="Openerp">
+            <openerp:ids ref="#[payload]"/>
+            <openerp:fields>
+                <openerp:field>status</openerp:field>
+                <openerp:field>product_uom_qty</openerp:field>
+                <openerp:field>product_id</openerp:field>
+                <openerp:field>name</openerp:field>
+                <openerp:field>hight</openerp:field>
+                <openerp:field>network</openerp:field>
+                <openerp:field>type</openerp:field>
+                <openerp:field>latitude</openerp:field>
+                <openerp:field>explore_datetime</openerp:field>
+                <openerp:field>power</openerp:field>
+                <openerp:field>images</openerp:field>
+                <openerp:field>longitue</openerp:field>
+                <openerp:field>sn</openerp:field>
+                <openerp:field>id</openerp:field>
+                <openerp:field>turn_on_time</openerp:field>
+                <openerp:field>turn_off_time</openerp:field>
+            </openerp:fields>
+        </openerp:oe-read>
+        <mcdatamapper:mapping config-ref="Mcdatamapper" outputAsJson="true" rule="{type:&quot;raw&quot;}" doc:name="Mcdatamapper"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <responsemodule:to-success-json-array config-ref="Responsemodule" message="OK" data="#[payload]" doc:name="Responsemodule"/>
+    </sub-flow>
+    <sub-flow name="get_images_from_db" doc:name="get_images_from_db">
+        <mcdatamapper:mapping config-ref="Mcdatamapper" inputAsJSON="true" rule="{type: &quot;raw&quot;}" doc:name="Mcdatamapper"/>
+        <openerp:oe-search2 config-ref="Openerp" model="rm.order_imageline" jsonExpr="[
+['order_line_id','=',#[payload.id]]
+]" doc:name="Openerp"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <openerp:oe-read config-ref="Openerp" model="rm.order_imageline" doc:name="Openerp">
+            <openerp:ids ref="#[payload]"/>
+            <openerp:fields>
+                <openerp:field>image</openerp:field>
+            </openerp:fields>
+        </openerp:oe-read>
+        <mcdatamapper:mapping config-ref="Mcdatamapper" outputAsJson="true" rule="{type:&quot;raw&quot;}" doc:name="Mcdatamapper"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <responsemodule:to-success-json-array config-ref="Responsemodule" message="OK" data="#[payload]" doc:name="Responsemodule"/>
+    </sub-flow>
+    <sub-flow name="get_info_by_lineid" doc:name="get_info_by_lineid">
+        <mcdatamapper:mapping config-ref="Mcdatamapper" inputAsJSON="true" rule="{type:&quot;raw&quot;}" doc:name="Mcdatamapper"/>
+        <openerp:oe-execute config-ref="Openerp" jsonArrayParam="[#[payload.line_id]]" method="get_info_by_lineid" model="rm.nationalcenter" username="#[message.outboundProperties['auth_name']]" password="#[message.outboundProperties['auth_password']]" doc:name="Openerp"/>
+        <mcdatamapper:mapping config-ref="Mcdatamapper" outputAsJson="true" rule="{type:&quot;raw&quot;}" doc:name="Mcdatamapper"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <responsemodule:to-success-json config-ref="Responsemodule" message="OK" data="#[payload]" doc:name="Responsemodule"/>
+    </sub-flow>
+    
+    <sub-flow name="update_orderline" doc:name="update_orderline">
+        <mcdatamapper:mapping config-ref="Mcdatamapper" rule="{type: &quot;map&quot;,map_type: [{name: &quot;power&quot;,type: &quot;boolean&quot;},{name: &quot;chinaunicom&quot;,type: &quot;boolean&quot;},{name: &quot;chinatelecom&quot;,type: &quot;boolean&quot;},{name: &quot;line_id&quot;,type: &quot;integer&quot;},{name: &quot;wifi&quot;,type: &quot;boolean&quot;},{name: &quot;adsl&quot;,type: &quot;boolean&quot;},{name:&quot;status&quot;,type:&quot;string&quot;},{name:&quot;explore_datetime&quot;,type:&quot;string&quot;},{name: &quot;latitude&quot;,type: &quot;raw&quot;},{name: &quot;longitue&quot;,type: &quot;raw&quot;},{name: &quot;transport&quot;,type: &quot;boolean&quot;},{name: &quot;images&quot;,type: &quot;list&quot;,list_type:{ type:&quot;string&quot; }}]}" doc:name="Mcdatamapper" inputAsJSON="true"/>
+        <logger message="'#[payload.explore_datetime]'" level="INFO" doc:name="Logger"/>
+        <enricher source="#[payload]" target="#[message.outboundProperties['line_ids']]" doc:name="Message Enricher get line_ids">
+            <flow-ref name="get_line_id" doc:name="Flow Reference"/>
+        </enricher>
+        <enricher source="#[payload]" target="#[message.outboundProperties['line_images']]" doc:name="Message Enricher get images">
+            <flow-ref name="get_images" doc:name="Flow Reference"/>
+        </enricher>
+        <logger message="#[payload.explore_datetime]" level="INFO" doc:name="Logger"/>
+        <openerp:oe-write config-ref="Openerp" model="sale.order.line" data="{
+'power': #[payload.power],
+'chinaunicom': #[payload.chinaunicom],
+'chinatelecom': #[payload.chinatelecom],
+'wifi': #[payload.wifi],
+'adsl': #[payload.adsl],
+'images': #[message.outboundProperties['line_images']],
+'status':&quot;#[payload.status]&quot;,
+'explore_datetime':&quot;#[payload.explore_datetime]&quot;,
+'latitude':#[payload.latitude],
+'longitue': #[payload.longitue],
+'transport': #[payload.transport]
+}" doc:name="Openerp" password="#[message.outboundProperties['auth_password']]" username="#[message.outboundProperties['auth_name']]">
+            <openerp:ids ref="#[message.outboundProperties['line_ids']]"/>
+        </openerp:oe-write>
+        <responsemodule:to-success-boolean config-ref="Responsemodule"  doc:name="Responsemodule" data="#[payload]" message="OK"/>
+    </sub-flow>
+    <sub-flow name="update_orderline_new" doc:name="update_orderline_new">
+        <mcdatamapper:mapping config-ref="Mcdatamapper" inputAsJSON="true" rule="{type: &quot;map&quot;,map_type: [{name: &quot;network&quot;,type: &quot;boolean&quot;},{name: &quot;transport&quot;,type: &quot;boolean&quot;},{name: &quot;product_uom_qty&quot;,type: &quot;string&quot;},{name: &quot;power&quot;,type: &quot;boolean&quot;},{name: &quot;name&quot;,type: &quot;string&quot;},{name: &quot;product_id&quot;,type: &quot;integer&quot;},{name: &quot;hight&quot;,type: &quot;raw&quot;},{name: &quot;network&quot;,type: &quot;boolean&quot;},{name: &quot;status&quot;,type:&quot;string&quot;},{name: &quot;explore_datetime&quot;,type:&quot;string&quot;},{name: &quot;latitude&quot;,type: &quot;raw&quot;},{name: &quot;longitue&quot;,type: &quot;raw&quot;},{name: &quot;type&quot;,type: &quot;string&quot;},{name: &quot;turn_off_time&quot;,type: &quot;raw&quot;},{name: &quot;turn_on_time&quot;,type: &quot;raw&quot;},{name: &quot;sn&quot;,type: &quot;string&quot;},{name: &quot;line_id&quot;,type: &quot;integer&quot;},{name: &quot;line_images&quot;,from_name:&quot;images&quot;,type: &quot;list&quot;,list_type:{ type:&quot;string&quot; }}]}" doc:name="Mcdatamapper"/>
+        <logger level="INFO" doc:name="Logger" message="#[payload]"/>
+        <enricher source="#[payload]" target="#[message.outboundProperties['line_ids']]" doc:name="Message Enricher get line_ids">
+            <flow-ref name="get_line_id" doc:name="Flow Reference"/>
+        </enricher>
+        <enricher source="#[payload]" target="#[message.outboundProperties['line_images']]" doc:name="Message Enricher get images">
+            <flow-ref name="get_images" doc:name="Flow Reference"/>
+        </enricher>
+        <logger level="INFO" doc:name="Logger" message="#[message.outboundProperties['line_images']]"/>
+        <openerp:oe-write config-ref="Openerp" model="sale.order.line" data="{
+'power': #[payload.power],
+'product_uom_qty': #[payload.product_uom_qty],
+'name': &quot;#[payload.name]&quot;,
+'product_id': #[payload.product_id],
+'hight': #[payload.hight],
+'mobile_images': #[message.outboundProperties['line_images']],
+'status':&quot;#[payload.status]&quot;,
+'explore_datetime':&quot;#[payload.explore_datetime]&quot;,
+'latitude':#[payload.latitude],
+'longitue': #[payload.longitue],
+'type': &quot;#[payload.type]&quot;,
+'turn_off_time':#[payload.turn_off_time],
+'turn_on_time': #[payload.turn_on_time],
+'sn': &quot;#[payload.sn]&quot;,
+'transport': #[payload.transport],
+'network': #[payload.network]
+}" doc:name="Openerp">
+            <openerp:ids ref="#[message.outboundProperties['line_ids']]"/>
+        </openerp:oe-write>
+        <responsemodule:to-success-boolean config-ref="Responsemodule" message="OK" data="#[payload]" doc:name="Responsemodule"/>
+    </sub-flow>
+    <sub-flow name="create_orderline" doc:name="create_orderline">
+        <mcdatamapper:mapping config-ref="Mcdatamapper" inputAsJSON="true" rule="{type: &quot;map&quot;,map_type: [{name: &quot;network&quot;,type: &quot;boolean&quot;},{name: &quot;transport&quot;,type: &quot;boolean&quot;},{name: &quot;product_uom_qty&quot;,type: &quot;integer&quot;},{name: &quot;power&quot;,type: &quot;boolean&quot;},{name: &quot;name&quot;,type: &quot;string&quot;},{name: &quot;product_id&quot;,type: &quot;integer&quot;},{name: &quot;hight&quot;,type: &quot;raw&quot;},{name: &quot;network&quot;,type: &quot;boolean&quot;},{name: &quot;status&quot;,type:&quot;string&quot;},{name: &quot;explore_datetime&quot;,type:&quot;string&quot;},{name: &quot;latitude&quot;,type: &quot;raw&quot;},{name: &quot;longitue&quot;,type: &quot;raw&quot;},{name: &quot;type&quot;,type: &quot;string&quot;},{name: &quot;turn_off_time&quot;,type: &quot;raw&quot;},{name: &quot;turn_on_time&quot;,type: &quot;raw&quot;},{name: &quot;sn&quot;,type: &quot;string&quot;},{name: &quot;order_id&quot;,type: &quot;integer&quot;},{name: &quot;line_images&quot;,from_name:&quot;images&quot;,type: &quot;list&quot;,list_type:{ type:&quot;string&quot; }}]}" doc:name="Mcdatamapper"/>
+        <logger message="{
+'order_id':#[payload.order_id],
+'power': #[payload.power],
+'product_uom_qty': #[payload.product_uom_qty],
+'name': &quot;#[payload.name]&quot;,
+'product_id': #[payload.product_id],
+'hight': #[payload.hight],
+'line_images': #[message.outboundProperties['line_images']],
+'status':&quot;#[payload.status]&quot;,
+'explore_datetime':&quot;#[payload.explore_datetime]&quot;,
+'latitude':#[payload.latitude],
+'longitue': #[payload.longitue],
+'type': &quot;#[payload.type]&quot;,
+'turn_off_time':#[payload.turn_off_time],
+'turn_on_time': #[payload.turn_on_time],
+'sn': &quot;#[payload.sn]&quot;,
+'transport': #[payload.transport],
+'network': #[payload.network]
+]
+}" level="INFO" doc:name="Logger"/>
+        <enricher source="#[payload]" target="#[message.outboundProperties['line_images']]" doc:name="Message Enricher get images">
+            <flow-ref name="get_images" doc:name="Flow Reference"/>
+        </enricher>
+        <openerp:oe-create config-ref="Openerp" model="sale.order.line" data="{
+'order_id':#[payload.order_id],
+'power': #[payload.power],
+'product_uom_qty': #[payload.product_uom_qty],
+'name': &quot;#[payload.name]&quot;,
+'product_id': #[payload.product_id],
+'hight': #[payload.hight],
+'status':&quot;#[payload.status]&quot;,
+'explore_datetime':&quot;#[payload.explore_datetime]&quot;,
+'latitude':#[payload.latitude],
+'longitue': #[payload.longitue],
+'type': &quot;#[payload.type]&quot;,
+'turn_off_time':#[payload.turn_off_time],
+'turn_on_time': #[payload.turn_on_time],
+'sn': &quot;#[payload.sn]&quot;,
+'transport': #[payload.transport],
+'network': #[payload.network],
+'mobile_images': #[message.outboundProperties['line_images']]
+}" doc:name="Openerp"/>
+        <responsemodule:to-success-integer config-ref="Responsemodule" message="OK" data="#[payload]" doc:name="Responsemodule"/>
+    </sub-flow>
+    <sub-flow name="debug_point" doc:name="debug_point">
+        <mcdatamapper:mapping config-ref="Mcdatamapper" inputAsJSON="true" rule="{type:&quot;raw&quot;}" doc:name="Mcdatamapper"/>
+        <logger level="INFO" doc:name="Logger" message="#[payload]"/>
+        <enricher source="#[payload]" target="#[message.outboundProperties['line_ids']]" doc:name="Message Enricher get line_ids">
+            <flow-ref name="get_line_id" doc:name="Flow Reference"/>
+        </enricher>
+        <logger message="{
+'install_datetime': &quot;#[payload.install_datetime]&quot;,
+'install_time': #[payload.install_time],
+'status': &quot;#[payload.status]&quot;,
+'device_sn':&quot;#[payload.device_sn]&quot;,
+'install_remark':&quot;#[payload.install_remark]&quot;
+}" level="INFO" doc:name="Logger"/>
+        <openerp:oe-write config-ref="Openerp" model="sale.order.line" data="{
+'install_datetime': &quot;#[payload.install_datetime]&quot;,
+'install_time': #[payload.install_time],
+'status': &quot;#[payload.status]&quot;,
+'device_sn':&quot;#[payload.device_sn]&quot;,
+'install_remark':&quot;#[payload.install_remark]&quot;
+}" doc:name="Openerp" password="#[message.outboundProperties['auth_password']]" username="#[message.outboundProperties['auth_name']]">
+            <openerp:ids ref="#[message.outboundProperties['line_ids']]"/>
+        </openerp:oe-write>
+        <responsemodule:to-success-string config-ref="Responsemodule" message="OK" data="#[payload]" doc:name="Responsemodule"/>
+    </sub-flow>
+    <sub-flow name="get_line_id" doc:name="get_line_id">
+        <set-payload value="[ #[payload.line_id] ]" doc:name="Set Payload"/>
+        <mcdatamapper:mapping config-ref="Mcdatamapper" inputAsJSON="true" rule="{type: &quot;list&quot;,list_type: {type: &quot;integer&quot;}}" doc:name="Mcdatamapper"/>
+    </sub-flow>
+    <sub-flow name="get_images" doc:name="get_images">
+        <set-payload value="#[payload.line_images]" doc:name="Set Payload"/>
+        <mcdatamapper:mapping config-ref="Mcdatamapper" rule="{type:&quot;raw&quot;}" doc:name="Mcdatamapper" outputAsJson="true"/>
+    </sub-flow>
+</mule>

@@ -1,0 +1,1616 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="peoples_daily">
+    <global-element type="http://www.mulesoft.org/schema/mule/openerp/config" name="Openerp" entity-id="Openerp#1">
+        <properties>
+            <property value="8069" name="port"/>
+            <property value="rm_demo" name="db"/>
+            <property value="admin" name="username"/>
+            <property value="115.28.1.69" name="address"/>
+            <property value="Openerp" name="name"/>
+            <property value="123" name="password"/>
+            <property value="1" name="auxiliary;index"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/connection-pooling-profile;0">
+                <property value="WHEN_EXHAUSTED_GROW" name="exhaustedAction"/>
+                <property value="true" name="isProcessed$$$$"/>
+                <property value="2" name="auxiliary;wrapIn"/>
+                <property value="2" name="auxiliary;index"/>
+                <property value="INITIALISE_ONE" name="initialisationPolicy"/>
+            </property-collection>
+        </properties>
+    </global-element>
+    <global-element type="http://www.mulesoft.org/schema/mule/responsemodule/config" name="Responsemodule" entity-id="Responsemodule#1">
+        <properties>
+            <property value="Responsemodule" name="name"/>
+            <property value="3" name="auxiliary;index"/>
+        </properties>
+    </global-element>
+    <global-element type="http://www.mulesoft.org/schema/mule/mcdatamapper/config" name="Mcdatamapper" entity-id="Mcdatamapper#1">
+        <properties>
+            <property value="Mcdatamapper" name="name"/>
+            <property value="4" name="auxiliary;index"/>
+        </properties>
+    </global-element>
+    <global-element type="http://www.mulesoft.org/schema/mule/core/choice-exception-strategy" name="Choice Exception Strategy" entity-id="Choice Exception Strategy#1">
+        <properties>
+            <property value="Choice_Exception_Strategy" name="name"/>
+            <property value="5" name="auxiliary;index"/>
+        </properties>
+        <compartment>
+            <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#1">
+                <scope type="http://www.mulesoft.org/schema/mule/core/catch-exception-strategy" name="General Exception [code=-1]" entity-id="Catch Exception Strategy#1">
+                    <graphicalData height="0" width="0" y="0" x="0"/>
+                    <properties>
+                        <property name="labelConfigureConditionalExecutionUsingExpression"/>
+                        <property name="when"/>
+                        <property name="enableNotifications"/>
+                        <property value="6" name="auxiliary;index"/>
+                    </properties>
+                    <compartment entity-id="compartment#1">
+                        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#2">
+                            <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#2">
+<graphicalData height="0" width="0" y="0" x="0"/>
+<properties>
+    <property value="Internal Server Exception" name="message"/>
+    <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-error" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+    <property value="-1" name="code"/>
+    <property value="Responsemodule" name="config-ref"/>
+    <property value="7" name="auxiliary;index"/>
+</properties>
+                            </pattern>
+                        </lane>
+                    </compartment>
+                </scope>
+            </lane>
+        </compartment>
+    </global-element>
+    <global-element type="http://www.mulesoft.org/schema/mule/core/catch-exception-strategy" name="Catch Exception Strategy" entity-id="Catch Exception Strategy#2">
+        <properties>
+            <property name=""/>
+            <property value="XML_PRC_Exception" name="name"/>
+            <property value="exception.causedBy(org.apache.xmlrpc.XmlRpcException)" name="when"/>
+            <property name="enableNotifications"/>
+            <property value="8" name="auxiliary;index"/>
+        </properties>
+        <compartment>
+            <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#3">
+                <pattern type="org.mule.tooling.ui.modules.core.pattern.customTransformer" name="Java" entity-id="Java#1">
+                    <graphicalData height="0" width="0" y="0" x="0"/>
+                    <properties>
+                        <property name="returnClass"/>
+                        <property name="ignoreBadInput"/>
+                        <property name="encoding"/>
+                        <property value="com.mobilitychina.peoplesdaily.esb.transformer.ToParseXmlPpcException" name="class"/>
+                        <property value="9" name="auxiliary;index"/>
+                        <property name="mimeType"/>
+                    </properties>
+                </pattern>
+                <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#3">
+                    <graphicalData height="0" width="0" y="0" x="0"/>
+                    <properties>
+                        <property value="#[payload[&quot;message&quot;]]" name="message"/>
+                        <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-error" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                        <property value="#[payload[&quot;code&quot;]]" name="code"/>
+                        <property value="Responsemodule" name="config-ref"/>
+                        <property value="10" name="auxiliary;index"/>
+                    </properties>
+                </pattern>
+            </lane>
+        </compartment>
+    </global-element>
+    <flow SubFlow="false" name="main" entity-id="0bea20b1-4e7d-4335-94e8-08a947258795">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="11" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#4">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <endpoint message-exchange-pattern="RequestResponse" direction="Inbound" type="http://www.mulesoft.org/schema/mule/http/endpoint" name="HTTP" entity-id="HTTP#1">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="8092" name="port"/>
+                    <property value="0.0.0.0" name="host"/>
+                    <property name="businessEventsLabel"/>
+                    <property name="followRedirects"/>
+                    <property value="http://www.mulesoft.org/schema/mule/http/endpoint" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="keep-alive"/>
+                    <property name="contentType"/>
+                    <property name="disableTransportTransformer"/>
+                    <property name="password"/>
+                    <property value="request-response" name="exchange-pattern"/>
+                    <property name="tracking:enable-default-events"/>
+                    <property name="ref"/>
+                    <property name="httpLabel"/>
+                    <property name="transformer-refs"/>
+                    <property name="address"/>
+                    <property name="encoding"/>
+                    <property name="path"/>
+                    <property name="responseTransformer-refs"/>
+                    <property name="method"/>
+                    <property name="user"/>
+                    <property value="12" name="auxiliary;index"/>
+                    <property name="mimeType"/>
+                    <property name="responseTimeout"/>
+                    <property name="connector-ref"/>
+                </properties>
+            </endpoint>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/object-to-string-transformer" name="Object to String" entity-id="Object to String#1">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name="returnClass"/>
+                    <property name="ignoreBadInput"/>
+                    <property name="encoding"/>
+                    <property value="13" name="auxiliary;index"/>
+                    <property name="mimeType"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#1">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="14" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/component" name="Java" entity-id="Java#2">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="com.mobilitychina.peoplesdaily.esb.component.ParseRequest" name="class"/>
+                    <property value="15" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <scope type="org.mule.tooling.ui.modules.core.scope.enricher" name="Message Enricher" entity-id="Message Enricher#1">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="source"/>
+                    <property value="#[message.outboundProperties['auth_result']]" name="target"/>
+                    <property value="16" name="auxiliary;index"/>
+                </properties>
+                <compartment entity-id="compartment#2">
+                    <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#5">
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="Flow Reference" entity-id="Flow Reference#1">
+                            <graphicalData height="0" width="0" y="0" x="0"/>
+                            <properties>
+<property value="flow_auth" name="name"/>
+<property value="17" name="auxiliary;index"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                </compartment>
+            </scope>
+            <splitter index="18" type="org.mule.tooling.ui.modules.core.pattern.cbr" name="Choice" entity-id="Choice#1">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="18" name=";INDEX"/>
+                    <property-collection name="fefa3d8a-1d2a-4923-899b-c61204e6130e">
+                        <property value="#[message.outboundProperties['auth_result']==true]" name="choice.expression"/>
+                        <property-collection name="choice.attributes">
+                            <property value="#[message.outboundProperties['auth_result']==true]" name="expression"/>
+                        </property-collection>
+                    </property-collection>
+                    <property-collection name="d88ce694-632c-4a9d-a4a4-4e8c703556dc">
+                        <property value="true" name="choice.otherwise"/>
+                        <property-collection name="choice.attributes"/>
+                    </property-collection>
+                </properties>
+                <pattern type="org.mule.tooling.ui.modules.core.pattern.cbr" name="Choice" entity-id="Choice#2">
+                    <properties>
+                        <property value="18" name=";INDEX"/>
+                        <property-collection name="fefa3d8a-1d2a-4923-899b-c61204e6130e">
+                            <property value="#[message.outboundProperties['auth_result']==true]" name="choice.expression"/>
+                            <property-collection name="choice.attributes">
+<property value="#[message.outboundProperties['auth_result']==true]" name="expression"/>
+                            </property-collection>
+                        </property-collection>
+                        <property-collection name="d88ce694-632c-4a9d-a4a4-4e8c703556dc">
+                            <property value="true" name="choice.otherwise"/>
+                            <property-collection name="choice.attributes"/>
+                        </property-collection>
+                    </properties>
+                </pattern>
+                <compartment entity-id="compartment#3">
+                    <lane isChoiceOtherwiseLane="false" index="20" hadOnlyOneElement="false" entity-id="fefa3d8a-1d2a-4923-899b-c61204e6130e">
+                        <splitter index="20" type="org.mule.tooling.ui.modules.core.pattern.cbr" name="Choice" entity-id="Choice#3">
+                            <graphicalData height="0" width="0" y="0" x="0"/>
+                            <properties>
+<property value="20" name=";INDEX"/>
+<property-collection name="ff984386-dd05-4e98-be8f-7f0b243ee2a6">
+    <property value="true" name="choice.otherwise"/>
+    <property-collection name="choice.attributes"/>
+</property-collection>
+<property-collection name="e281cbbd-6ca0-4eae-93d7-7836da982203">
+    <property value="#[message.inboundProperties['http.relative.path'] == 'get_draft_saleorder']" name="choice.expression"/>
+    <property-collection name="choice.attributes">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'get_draft_saleorder']" name="expression"/>
+    </property-collection>
+</property-collection>
+<property-collection name="6bc6b08f-4a6d-40b5-a7b6-d262c0a3e10a">
+    <property value="#[message.inboundProperties['http.relative.path'] == 'debug_point']" name="choice.expression"/>
+    <property-collection name="choice.attributes">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'debug_point']" name="expression"/>
+    </property-collection>
+</property-collection>
+<property-collection name="7a5b12b6-d31e-4267-bf04-cfb2d3d2ae5e">
+    <property value="#[message.inboundProperties['http.relative.path'] == 'get_draft_saleorderline']" name="choice.expression"/>
+    <property-collection name="choice.attributes">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'get_draft_saleorderline']" name="expression"/>
+    </property-collection>
+</property-collection>
+<property-collection name="526906da-71b1-4f08-98fe-7a6ef50adcc3">
+    <property value="#[message.inboundProperties['http.relative.path'] == 'create_orderline']" name="choice.expression"/>
+    <property-collection name="choice.attributes">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'create_orderline']" name="expression"/>
+    </property-collection>
+</property-collection>
+<property-collection name="2ef529a3-e99f-4c85-83ba-d22bd2061980">
+    <property value="#[message.inboundProperties['http.relative.path'] == 'getinfobylineid']" name="choice.expression"/>
+    <property-collection name="choice.attributes">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'getinfobylineid']" name="expression"/>
+    </property-collection>
+</property-collection>
+<property-collection name="183e4b10-7ff6-4c37-816b-d37e26a36064">
+    <property value="#[message.inboundProperties['http.relative.path'] == 'update_orderline_new']" name="choice.expression"/>
+    <property-collection name="choice.attributes">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'update_orderline_new']" name="expression"/>
+    </property-collection>
+</property-collection>
+<property-collection name="9215be43-f498-47c0-b9ab-aec30276b087">
+    <property value="#[message.inboundProperties['http.relative.path'] == 'get_images_from_db']" name="choice.expression"/>
+    <property-collection name="choice.attributes">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'get_images_from_db']" name="expression"/>
+    </property-collection>
+</property-collection>
+<property-collection name="c58590e5-c968-4ec9-a52b-44a9416799c6">
+    <property value="#[message.inboundProperties['http.relative.path'] == 'getallorderline']" name="choice.expression"/>
+    <property-collection name="choice.attributes">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'getallorderline']" name="expression"/>
+    </property-collection>
+</property-collection>
+<property-collection name="621dc029-8e21-4702-aad8-d14661b76697">
+    <property value="#[message.inboundProperties['http.relative.path'] == 'login']" name="choice.expression"/>
+    <property-collection name="choice.attributes">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'login']" name="expression"/>
+    </property-collection>
+</property-collection>
+<property-collection name="02eb112e-3d9f-42d7-8d85-0846fcd44006">
+    <property value="#[message.inboundProperties['http.relative.path'] == 'updateorderline']" name="choice.expression"/>
+    <property-collection name="choice.attributes">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'updateorderline']" name="expression"/>
+    </property-collection>
+</property-collection>
+                            </properties>
+                            <pattern type="org.mule.tooling.ui.modules.core.pattern.cbr" name="Choice" entity-id="Choice#4">
+<properties>
+    <property value="20" name=";INDEX"/>
+    <property-collection name="ff984386-dd05-4e98-be8f-7f0b243ee2a6">
+        <property value="true" name="choice.otherwise"/>
+        <property-collection name="choice.attributes"/>
+    </property-collection>
+    <property-collection name="e281cbbd-6ca0-4eae-93d7-7836da982203">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'get_draft_saleorder']" name="choice.expression"/>
+        <property-collection name="choice.attributes">
+            <property value="#[message.inboundProperties['http.relative.path'] == 'get_draft_saleorder']" name="expression"/>
+        </property-collection>
+    </property-collection>
+    <property-collection name="6bc6b08f-4a6d-40b5-a7b6-d262c0a3e10a">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'debug_point']" name="choice.expression"/>
+        <property-collection name="choice.attributes">
+            <property value="#[message.inboundProperties['http.relative.path'] == 'debug_point']" name="expression"/>
+        </property-collection>
+    </property-collection>
+    <property-collection name="7a5b12b6-d31e-4267-bf04-cfb2d3d2ae5e">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'get_draft_saleorderline']" name="choice.expression"/>
+        <property-collection name="choice.attributes">
+            <property value="#[message.inboundProperties['http.relative.path'] == 'get_draft_saleorderline']" name="expression"/>
+        </property-collection>
+    </property-collection>
+    <property-collection name="526906da-71b1-4f08-98fe-7a6ef50adcc3">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'create_orderline']" name="choice.expression"/>
+        <property-collection name="choice.attributes">
+            <property value="#[message.inboundProperties['http.relative.path'] == 'create_orderline']" name="expression"/>
+        </property-collection>
+    </property-collection>
+    <property-collection name="2ef529a3-e99f-4c85-83ba-d22bd2061980">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'getinfobylineid']" name="choice.expression"/>
+        <property-collection name="choice.attributes">
+            <property value="#[message.inboundProperties['http.relative.path'] == 'getinfobylineid']" name="expression"/>
+        </property-collection>
+    </property-collection>
+    <property-collection name="183e4b10-7ff6-4c37-816b-d37e26a36064">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'update_orderline_new']" name="choice.expression"/>
+        <property-collection name="choice.attributes">
+            <property value="#[message.inboundProperties['http.relative.path'] == 'update_orderline_new']" name="expression"/>
+        </property-collection>
+    </property-collection>
+    <property-collection name="9215be43-f498-47c0-b9ab-aec30276b087">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'get_images_from_db']" name="choice.expression"/>
+        <property-collection name="choice.attributes">
+            <property value="#[message.inboundProperties['http.relative.path'] == 'get_images_from_db']" name="expression"/>
+        </property-collection>
+    </property-collection>
+    <property-collection name="c58590e5-c968-4ec9-a52b-44a9416799c6">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'getallorderline']" name="choice.expression"/>
+        <property-collection name="choice.attributes">
+            <property value="#[message.inboundProperties['http.relative.path'] == 'getallorderline']" name="expression"/>
+        </property-collection>
+    </property-collection>
+    <property-collection name="621dc029-8e21-4702-aad8-d14661b76697">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'login']" name="choice.expression"/>
+        <property-collection name="choice.attributes">
+            <property value="#[message.inboundProperties['http.relative.path'] == 'login']" name="expression"/>
+        </property-collection>
+    </property-collection>
+    <property-collection name="02eb112e-3d9f-42d7-8d85-0846fcd44006">
+        <property value="#[message.inboundProperties['http.relative.path'] == 'updateorderline']" name="choice.expression"/>
+        <property-collection name="choice.attributes">
+            <property value="#[message.inboundProperties['http.relative.path'] == 'updateorderline']" name="expression"/>
+        </property-collection>
+    </property-collection>
+</properties>
+                            </pattern>
+                            <compartment entity-id="compartment#4">
+<lane isChoiceOtherwiseLane="false" index="22" hadOnlyOneElement="false" entity-id="621dc029-8e21-4702-aad8-d14661b76697">
+    <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="login" entity-id="Responsemodule#4">
+        <graphicalData height="0" width="0" y="0" x="0"/>
+        <properties>
+            <property value="OK" name="message"/>
+            <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-success-string" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+            <property value="#[payload]" name="data"/>
+            <property value="Responsemodule" name="config-ref"/>
+            <property value="22" name="auxiliary;index"/>
+        </properties>
+    </pattern>
+</lane>
+<lane isChoiceOtherwiseLane="false" index="24" hadOnlyOneElement="false" entity-id="c58590e5-c968-4ec9-a52b-44a9416799c6">
+    <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="get all orderline" entity-id="Flow Reference#2">
+        <graphicalData height="0" width="0" y="0" x="0"/>
+        <properties>
+            <property value="get_all_orderline" name="name"/>
+            <property value="24" name="auxiliary;index"/>
+        </properties>
+    </pattern>
+</lane>
+<lane isChoiceOtherwiseLane="false" index="26" hadOnlyOneElement="false" entity-id="2ef529a3-e99f-4c85-83ba-d22bd2061980">
+    <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="get info by lineid" entity-id="Flow Reference#3">
+        <graphicalData height="0" width="0" y="0" x="0"/>
+        <properties>
+            <property value="get_info_by_lineid" name="name"/>
+            <property value="26" name="auxiliary;index"/>
+        </properties>
+    </pattern>
+</lane>
+<lane isChoiceOtherwiseLane="false" index="28" hadOnlyOneElement="false" entity-id="02eb112e-3d9f-42d7-8d85-0846fcd44006">
+    <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="update orderline" entity-id="Flow Reference#4">
+        <graphicalData height="0" width="0" y="0" x="0"/>
+        <properties>
+            <property value="update_orderline" name="name"/>
+            <property value="28" name="auxiliary;index"/>
+        </properties>
+    </pattern>
+</lane>
+<lane isChoiceOtherwiseLane="false" index="30" hadOnlyOneElement="false" entity-id="6bc6b08f-4a6d-40b5-a7b6-d262c0a3e10a">
+    <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="debug point" entity-id="Flow Reference#5">
+        <graphicalData height="0" width="0" y="0" x="0"/>
+        <properties>
+            <property value="debug_point" name="name"/>
+            <property value="30" name="auxiliary;index"/>
+        </properties>
+    </pattern>
+</lane>
+<lane isChoiceOtherwiseLane="false" index="32" hadOnlyOneElement="false" entity-id="e281cbbd-6ca0-4eae-93d7-7836da982203">
+    <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="get draft saleorder" entity-id="Flow Reference#6">
+        <graphicalData height="0" width="0" y="0" x="0"/>
+        <properties>
+            <property value="get_draft_saleorder" name="name"/>
+            <property value="32" name="auxiliary;index"/>
+        </properties>
+    </pattern>
+</lane>
+<lane isChoiceOtherwiseLane="false" index="34" hadOnlyOneElement="false" entity-id="7a5b12b6-d31e-4267-bf04-cfb2d3d2ae5e">
+    <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="get draft saleorderline" entity-id="Flow Reference#7">
+        <graphicalData height="0" width="0" y="0" x="0"/>
+        <properties>
+            <property value="get_draft_saleorderline" name="name"/>
+            <property value="34" name="auxiliary;index"/>
+        </properties>
+    </pattern>
+</lane>
+<lane isChoiceOtherwiseLane="false" index="36" hadOnlyOneElement="false" entity-id="9215be43-f498-47c0-b9ab-aec30276b087">
+    <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="get images from db" entity-id="Flow Reference#8">
+        <graphicalData height="0" width="0" y="0" x="0"/>
+        <properties>
+            <property value="get_images_from_db" name="name"/>
+            <property value="36" name="auxiliary;index"/>
+        </properties>
+    </pattern>
+</lane>
+<lane isChoiceOtherwiseLane="false" index="38" hadOnlyOneElement="false" entity-id="183e4b10-7ff6-4c37-816b-d37e26a36064">
+    <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="update orderline new" entity-id="Flow Reference#9">
+        <graphicalData height="0" width="0" y="0" x="0"/>
+        <properties>
+            <property value="update_orderline_new" name="name"/>
+            <property value="38" name="auxiliary;index"/>
+        </properties>
+    </pattern>
+</lane>
+<lane isChoiceOtherwiseLane="false" index="40" hadOnlyOneElement="false" entity-id="526906da-71b1-4f08-98fe-7a6ef50adcc3">
+    <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="create orderline" entity-id="Flow Reference#10">
+        <graphicalData height="0" width="0" y="0" x="0"/>
+        <properties>
+            <property value="create_orderline" name="name"/>
+            <property value="40" name="auxiliary;index"/>
+        </properties>
+    </pattern>
+</lane>
+<lane isChoiceOtherwiseLane="true" index="42" hadOnlyOneElement="false" entity-id="ff984386-dd05-4e98-be8f-7f0b243ee2a6">
+    <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="No such method" entity-id="Responsemodule#5">
+        <graphicalData height="0" width="0" y="0" x="0"/>
+        <properties>
+            <property value="No such method" name="message"/>
+            <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-error" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+            <property value="-3" name="code"/>
+            <property value="Responsemodule" name="config-ref"/>
+            <property value="42" name="auxiliary;index"/>
+        </properties>
+    </pattern>
+</lane>
+                            </compartment>
+                        </splitter>
+                    </lane>
+                    <lane isChoiceOtherwiseLane="true" index="44" hadOnlyOneElement="false" entity-id="d88ce694-632c-4a9d-a4a4-4e8c703556dc">
+                        <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="username or password incorrect" entity-id="Responsemodule#6">
+                            <graphicalData height="0" width="0" y="0" x="0"/>
+                            <properties>
+<property value="username or password incorrect" name="message"/>
+<property value="http://www.mulesoft.org/schema/mule/responsemodule/to-error" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+<property value="-2" name="code"/>
+<property value="Responsemodule" name="config-ref"/>
+<property value="44" name="auxiliary;index"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                </compartment>
+            </splitter>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="flow_auth" entity-id="4e2f8e4a-c571-44c1-a890-3c926f32df61">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="45" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#6">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#2">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="#[message.outboundProperties['auth_password']]" name="pwd"/>
+                    <property name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-login" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property value="#[message.outboundProperties['auth_name']]" name="user"/>
+                    <property name="password"/>
+                    <property value="46" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="get_all_orderline" entity-id="7234ed4a-bd1b-4c5e-8722-8742418e5105">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="47" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#7">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#2">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type:&quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="48" name="auxiliary;index"/>
+                    <property value="true" name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#3">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="[]" name="jsonArrayParam"/>
+                    <property value="rm.nationalcenter" name="model"/>
+                    <property value="#[message.outboundProperties['auth_name']]" name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-execute" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="get_all_orderline" name="method"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property value="#[message.outboundProperties['auth_password']]" name="password"/>
+                    <property value="49" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#3">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type: &quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="true" name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="50" name="auxiliary;index"/>
+                    <property name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#2">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="51" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#7">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="OK" name="message"/>
+                    <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-success-json-array" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="#[payload]" name="data"/>
+                    <property value="Responsemodule" name="config-ref"/>
+                    <property value="52" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="get_draft_saleorder" entity-id="048dc38a-97f0-4f04-b38e-15ac44a50a5e">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="53" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#8">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#4">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type:&quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="54" name="auxiliary;index"/>
+                    <property value="true" name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#4">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="sale.order" name="model"/>
+                    <property value="#[message.outboundProperties['auth_name']]" name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-search2" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="[['state','=','draft']]" name="jsonExpr"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property value="#[message.outboundProperties['auth_password']]" name="password"/>
+                    <property value="55" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#3">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="56" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#5">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="" name=""/>
+                    <property value="#[payload]" name="ref"/>
+                    <property value="sale.order" name="model"/>
+                    <property value="#[message.outboundProperties['auth_name']]" name="username"/>
+                    <property name="updated"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-read" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property value="#[message.outboundProperties['auth_password']]" name="password"/>
+                    <property value="57" name="auxiliary;index"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fieldss;1">
+                        <property value="true" name="isProcessed$$$$"/>
+                        <property value="59" name="auxiliary;index"/>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fe5">
+                            <property value="installation deadline" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fe4">
+                            <property value="client_order_ref" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fe7">
+                            <property value="channel_one" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fe6">
+                            <property value="channel_two" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fe9">
+                            <property value="name" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fe8">
+                            <property value="order_line" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fe1">
+                            <property value="contract modification" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fe0">
+                            <property value="shop_id" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fe3">
+                            <property value="channel level" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fe2">
+                            <property value="channeltype" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fdc">
+                            <property value="date_order" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fdd">
+                            <property value="state" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fde">
+                            <property value="partner_shipping_id" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fdf">
+                            <property value="building floors" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7feb">
+                            <property value="channel_three" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fec">
+                            <property value="partner_invoice_id" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fea">
+                            <property value="partner_id" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fda">
+                            <property value="id" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;-4266a051:141c41f6e87:-7fdb">
+                            <property value="contract periods" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="Entry" name="key"/>
+                        </property-collection>
+                    </property-collection>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-idss;1">
+                        <property value="#[payload]" name="ref"/>
+                        <property value="true" name="isProcessed$$$$"/>
+                        <property value="58" name="auxiliary;index"/>
+                    </property-collection>
+                </properties>
+                <description></description>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#5">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type:&quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="true" name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="79" name="auxiliary;index"/>
+                    <property name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#4">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="80" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <splitter index="81" type="org.mule.tooling.ui.modules.core.pattern.cbr" name="Choice" entity-id="Choice#5">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="81" name=";INDEX"/>
+                    <property-collection name="4401c6aa-36f3-4f33-afb2-796198ae559b">
+                        <property value="&quot;#[payload]&quot; != &quot;&quot;" name="choice.expression"/>
+                        <property-collection name="choice.attributes">
+                            <property value="&quot;#[payload]&quot; != &quot;&quot;" name="expression"/>
+                        </property-collection>
+                    </property-collection>
+                    <property-collection name="2fe076e9-58d9-4def-8b74-3ee7ef005dd1">
+                        <property value="true" name="choice.otherwise"/>
+                        <property-collection name="choice.attributes"/>
+                    </property-collection>
+                </properties>
+                <pattern type="org.mule.tooling.ui.modules.core.pattern.cbr" name="Choice" entity-id="Choice#6">
+                    <properties>
+                        <property value="81" name=";INDEX"/>
+                        <property-collection name="4401c6aa-36f3-4f33-afb2-796198ae559b">
+                            <property value="&quot;#[payload]&quot; != &quot;&quot;" name="choice.expression"/>
+                            <property-collection name="choice.attributes">
+<property value="&quot;#[payload]&quot; != &quot;&quot;" name="expression"/>
+                            </property-collection>
+                        </property-collection>
+                        <property-collection name="2fe076e9-58d9-4def-8b74-3ee7ef005dd1">
+                            <property value="true" name="choice.otherwise"/>
+                            <property-collection name="choice.attributes"/>
+                        </property-collection>
+                    </properties>
+                </pattern>
+                <compartment entity-id="compartment#5">
+                    <lane isChoiceOtherwiseLane="false" index="83" hadOnlyOneElement="false" entity-id="4401c6aa-36f3-4f33-afb2-796198ae559b">
+                        <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#8">
+                            <graphicalData height="0" width="0" y="0" x="0"/>
+                            <properties>
+<property value="OK" name="message"/>
+<property value="http://www.mulesoft.org/schema/mule/responsemodule/to-success-json-array" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+<property value="#[payload]" name="data"/>
+<property value="Responsemodule" name="config-ref"/>
+<property value="83" name="auxiliary;index"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                    <lane isChoiceOtherwiseLane="true" index="85" hadOnlyOneElement="false" entity-id="2fe076e9-58d9-4def-8b74-3ee7ef005dd1">
+                        <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#9">
+                            <graphicalData height="0" width="0" y="0" x="0"/>
+                            <properties>
+<property value="&quot;&quot;" name="message"/>
+<property value="http://www.mulesoft.org/schema/mule/responsemodule/to-success-null" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+<property value="Responsemodule" name="config-ref"/>
+<property value="85" name="auxiliary;index"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                </compartment>
+            </splitter>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="get_draft_saleorderline" entity-id="04628794-53b0-4147-90c5-824661358e02">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="86" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#9">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#6">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type:&quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="87" name="auxiliary;index"/>
+                    <property value="true" name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#6">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="sale.order.line" name="model"/>
+                    <property name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-search2" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="[&#xA;['order_id','=',#[payload.order_id]]&#xA;]" name="jsonExpr"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property name="password"/>
+                    <property value="88" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#5">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="89" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#7">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="sale.order.line" name="model"/>
+                    <property name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-read" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property name="password"/>
+                    <property value="90" name="auxiliary;index"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fieldss;0">
+                        <property value="true" name="isProcessed$$$$"/>
+                        <property value="92" name="auxiliary;wrapIn"/>
+                        <property value="92" name="auxiliary;index"/>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;1">
+                            <property value="status" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="93" name="auxiliary;wrapIn"/>
+                            <property value="93" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;2">
+                            <property value="product_uom_qty" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="94" name="auxiliary;wrapIn"/>
+                            <property value="94" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;3">
+                            <property value="product_id" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="95" name="auxiliary;wrapIn"/>
+                            <property value="95" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;4">
+                            <property value="name" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="96" name="auxiliary;wrapIn"/>
+                            <property value="96" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;5">
+                            <property value="hight" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="97" name="auxiliary;wrapIn"/>
+                            <property value="97" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;6">
+                            <property value="network" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="98" name="auxiliary;wrapIn"/>
+                            <property value="98" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;7">
+                            <property value="type" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="99" name="auxiliary;wrapIn"/>
+                            <property value="99" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;8">
+                            <property value="latitude" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="100" name="auxiliary;wrapIn"/>
+                            <property value="100" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;9">
+                            <property value="explore_datetime" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="101" name="auxiliary;wrapIn"/>
+                            <property value="101" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;10">
+                            <property value="power" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="102" name="auxiliary;wrapIn"/>
+                            <property value="102" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;11">
+                            <property value="images" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="103" name="auxiliary;wrapIn"/>
+                            <property value="103" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;12">
+                            <property value="longitue" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="104" name="auxiliary;wrapIn"/>
+                            <property value="104" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;13">
+                            <property value="sn" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="105" name="auxiliary;wrapIn"/>
+                            <property value="105" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;14">
+                            <property value="id" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="106" name="auxiliary;wrapIn"/>
+                            <property value="106" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;15">
+                            <property value="turn_on_time" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="107" name="auxiliary;wrapIn"/>
+                            <property value="107" name="auxiliary;index"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;16">
+                            <property value="turn_off_time" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="108" name="auxiliary;wrapIn"/>
+                            <property value="108" name="auxiliary;index"/>
+                        </property-collection>
+                    </property-collection>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-idss;0">
+                        <property value="#[payload]" name="ref"/>
+                        <property value="true" name="isProcessed$$$$"/>
+                        <property value="91" name="auxiliary;wrapIn"/>
+                        <property value="91" name="auxiliary;index"/>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#7">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type:&quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="true" name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="109" name="auxiliary;index"/>
+                    <property name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#6">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="110" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#10">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="OK" name="message"/>
+                    <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-success-json-array" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="#[payload]" name="data"/>
+                    <property value="Responsemodule" name="config-ref"/>
+                    <property value="111" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="get_images_from_db" entity-id="9209d7c1-0af2-44bb-96ae-46ee3963f70a">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="112" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#10">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#8">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type: &quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="113" name="auxiliary;index"/>
+                    <property value="true" name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#8">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="rm.order_imageline" name="model"/>
+                    <property name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-search2" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="[&#xA;['order_line_id','=',#[payload.id]]&#xA;]" name="jsonExpr"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property name="password"/>
+                    <property value="114" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#7">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="115" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#9">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="rm.order_imageline" name="model"/>
+                    <property name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-read" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property name="password"/>
+                    <property value="116" name="auxiliary;index"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fieldss;0">
+                        <property value="true" name="isProcessed$$$$"/>
+                        <property value="118" name="auxiliary;wrapIn"/>
+                        <property value="118" name="auxiliary;index"/>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-fields;1">
+                            <property value="image" name="value"/>
+                            <property value="true" name="isProcessed$$$$"/>
+                            <property value="119" name="auxiliary;wrapIn"/>
+                            <property value="119" name="auxiliary;index"/>
+                        </property-collection>
+                    </property-collection>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-read-idss;0">
+                        <property value="#[payload]" name="ref"/>
+                        <property value="true" name="isProcessed$$$$"/>
+                        <property value="117" name="auxiliary;wrapIn"/>
+                        <property value="117" name="auxiliary;index"/>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#9">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type:&quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="true" name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="120" name="auxiliary;index"/>
+                    <property name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#8">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="121" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#11">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="OK" name="message"/>
+                    <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-success-json-array" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="#[payload]" name="data"/>
+                    <property value="Responsemodule" name="config-ref"/>
+                    <property value="122" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="get_info_by_lineid" entity-id="3829a1f0-fed4-4714-ba44-b021f8da004d">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="123" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#11">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#10">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type:&quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="124" name="auxiliary;index"/>
+                    <property value="true" name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#10">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="[#[payload.line_id]]" name="jsonArrayParam"/>
+                    <property value="rm.nationalcenter" name="model"/>
+                    <property value="#[message.outboundProperties['auth_name']]" name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-execute" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="get_info_by_lineid" name="method"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property value="#[message.outboundProperties['auth_password']]" name="password"/>
+                    <property value="125" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#11">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type:&quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="true" name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="126" name="auxiliary;index"/>
+                    <property name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#9">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="127" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#12">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="OK" name="message"/>
+                    <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-success-json" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="#[payload]" name="data"/>
+                    <property value="Responsemodule" name="config-ref"/>
+                    <property value="128" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="update_orderline" entity-id="02fe6970-ca0c-4afb-80c6-8f387403338a">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="129" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#12">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#12">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type: &quot;map&quot;,map_type: [{name: &quot;power&quot;,type: &quot;boolean&quot;},{name: &quot;chinaunicom&quot;,type: &quot;boolean&quot;},{name: &quot;chinatelecom&quot;,type: &quot;boolean&quot;},{name: &quot;line_id&quot;,type: &quot;integer&quot;},{name: &quot;wifi&quot;,type: &quot;boolean&quot;},{name: &quot;adsl&quot;,type: &quot;boolean&quot;},{name:&quot;status&quot;,type:&quot;string&quot;},{name:&quot;explore_datetime&quot;,type:&quot;string&quot;},{name: &quot;latitude&quot;,type: &quot;raw&quot;},{name: &quot;longitue&quot;,type: &quot;raw&quot;},{name: &quot;transport&quot;,type: &quot;boolean&quot;},{name: &quot;images&quot;,type: &quot;list&quot;,list_type:{ type:&quot;string&quot; }}]}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="130" name="auxiliary;index"/>
+                    <property value="true" name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#10">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="'#[payload.explore_datetime]'" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="131" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <scope type="org.mule.tooling.ui.modules.core.scope.enricher" name="Message Enricher get line_ids" entity-id="Message Enricher#2">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="source"/>
+                    <property value="#[message.outboundProperties['line_ids']]" name="target"/>
+                    <property value="132" name="auxiliary;index"/>
+                </properties>
+                <compartment entity-id="compartment#6">
+                    <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#13">
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="Flow Reference" entity-id="Flow Reference#11">
+                            <graphicalData height="0" width="0" y="0" x="0"/>
+                            <properties>
+<property value="get_line_id" name="name"/>
+<property value="133" name="auxiliary;index"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                </compartment>
+            </scope>
+            <scope type="org.mule.tooling.ui.modules.core.scope.enricher" name="Message Enricher get images" entity-id="Message Enricher#3">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="source"/>
+                    <property value="#[message.outboundProperties['line_images']]" name="target"/>
+                    <property value="134" name="auxiliary;index"/>
+                </properties>
+                <compartment entity-id="compartment#7">
+                    <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#14">
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="Flow Reference" entity-id="Flow Reference#12">
+                            <graphicalData height="0" width="0" y="0" x="0"/>
+                            <properties>
+<property value="get_images" name="name"/>
+<property value="135" name="auxiliary;index"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                </compartment>
+            </scope>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#11">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload.explore_datetime]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="136" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#11">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="sale.order.line" name="model"/>
+                    <property value="#[message.outboundProperties['auth_name']]" name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-write" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="{&#xA;'power': #[payload.power],&#xA;'chinaunicom': #[payload.chinaunicom],&#xA;'chinatelecom': #[payload.chinatelecom],&#xA;'wifi': #[payload.wifi],&#xA;'adsl': #[payload.adsl],&#xA;'images': #[message.outboundProperties['line_images']],&#xA;'status':&quot;#[payload.status]&quot;,&#xA;'explore_datetime':&quot;#[payload.explore_datetime]&quot;,&#xA;'latitude':#[payload.latitude],&#xA;'longitue': #[payload.longitue],&#xA;'transport': #[payload.transport]&#xA;}" name="data"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property value="#[message.outboundProperties['auth_password']]" name="password"/>
+                    <property value="137" name="auxiliary;index"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-write-idss;0">
+                        <property value="#[message.outboundProperties['line_ids']]" name="ref"/>
+                        <property value="true" name="isProcessed$$$$"/>
+                        <property value="138" name="auxiliary;wrapIn"/>
+                        <property value="138" name="auxiliary;index"/>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#13">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="OK" name="message"/>
+                    <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-success-boolean" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="#[payload]" name="data"/>
+                    <property value="Responsemodule" name="config-ref"/>
+                    <property value="139" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="update_orderline_new" entity-id="b66fd3d6-ef72-45a1-bac6-52fe64f25f8a">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="140" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#15">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#13">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type: &quot;map&quot;,map_type: [{name: &quot;network&quot;,type: &quot;boolean&quot;},{name: &quot;transport&quot;,type: &quot;boolean&quot;},{name: &quot;product_uom_qty&quot;,type: &quot;string&quot;},{name: &quot;power&quot;,type: &quot;boolean&quot;},{name: &quot;name&quot;,type: &quot;string&quot;},{name: &quot;product_id&quot;,type: &quot;integer&quot;},{name: &quot;hight&quot;,type: &quot;raw&quot;},{name: &quot;network&quot;,type: &quot;boolean&quot;},{name: &quot;status&quot;,type:&quot;string&quot;},{name: &quot;explore_datetime&quot;,type:&quot;string&quot;},{name: &quot;latitude&quot;,type: &quot;raw&quot;},{name: &quot;longitue&quot;,type: &quot;raw&quot;},{name: &quot;type&quot;,type: &quot;string&quot;},{name: &quot;turn_off_time&quot;,type: &quot;raw&quot;},{name: &quot;turn_on_time&quot;,type: &quot;raw&quot;},{name: &quot;sn&quot;,type: &quot;string&quot;},{name: &quot;line_id&quot;,type: &quot;integer&quot;},{name: &quot;line_images&quot;,from_name:&quot;images&quot;,type: &quot;list&quot;,list_type:{ type:&quot;string&quot; }}]}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="141" name="auxiliary;index"/>
+                    <property value="true" name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#12">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="142" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <scope type="org.mule.tooling.ui.modules.core.scope.enricher" name="Message Enricher get line_ids" entity-id="Message Enricher#4">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="source"/>
+                    <property value="#[message.outboundProperties['line_ids']]" name="target"/>
+                    <property value="143" name="auxiliary;index"/>
+                </properties>
+                <compartment entity-id="compartment#8">
+                    <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#16">
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="Flow Reference" entity-id="Flow Reference#13">
+                            <graphicalData height="0" width="0" y="0" x="0"/>
+                            <properties>
+<property value="get_line_id" name="name"/>
+<property value="144" name="auxiliary;index"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                </compartment>
+            </scope>
+            <scope type="org.mule.tooling.ui.modules.core.scope.enricher" name="Message Enricher get images" entity-id="Message Enricher#5">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="source"/>
+                    <property value="#[message.outboundProperties['line_images']]" name="target"/>
+                    <property value="145" name="auxiliary;index"/>
+                </properties>
+                <compartment entity-id="compartment#9">
+                    <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#17">
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="Flow Reference" entity-id="Flow Reference#14">
+                            <graphicalData height="0" width="0" y="0" x="0"/>
+                            <properties>
+<property value="get_images" name="name"/>
+<property value="146" name="auxiliary;index"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                </compartment>
+            </scope>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#13">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[message.outboundProperties['line_images']]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="147" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#12">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="sale.order.line" name="model"/>
+                    <property name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-write" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="{&#xA;'power': #[payload.power],&#xA;'product_uom_qty': #[payload.product_uom_qty],&#xA;'name': &quot;#[payload.name]&quot;,&#xA;'product_id': #[payload.product_id],&#xA;'hight': #[payload.hight],&#xA;'mobile_images': #[message.outboundProperties['line_images']],&#xA;'status':&quot;#[payload.status]&quot;,&#xA;'explore_datetime':&quot;#[payload.explore_datetime]&quot;,&#xA;'latitude':#[payload.latitude],&#xA;'longitue': #[payload.longitue],&#xA;'type': &quot;#[payload.type]&quot;,&#xA;'turn_off_time':#[payload.turn_off_time],&#xA;'turn_on_time': #[payload.turn_on_time],&#xA;'sn': &quot;#[payload.sn]&quot;,&#xA;'transport': #[payload.transport],&#xA;'network': #[payload.network]&#xA;}" name="data"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property name="password"/>
+                    <property value="148" name="auxiliary;index"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-write-idss;0">
+                        <property value="#[message.outboundProperties['line_ids']]" name="ref"/>
+                        <property value="true" name="isProcessed$$$$"/>
+                        <property value="149" name="auxiliary;wrapIn"/>
+                        <property value="149" name="auxiliary;index"/>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#14">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="OK" name="message"/>
+                    <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-success-boolean" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="#[payload]" name="data"/>
+                    <property value="Responsemodule" name="config-ref"/>
+                    <property value="150" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="create_orderline" entity-id="1c1744c2-42a6-4347-ab14-50e907487860">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="151" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#18">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#14">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type: &quot;map&quot;,map_type: [{name: &quot;network&quot;,type: &quot;boolean&quot;},{name: &quot;transport&quot;,type: &quot;boolean&quot;},{name: &quot;product_uom_qty&quot;,type: &quot;integer&quot;},{name: &quot;power&quot;,type: &quot;boolean&quot;},{name: &quot;name&quot;,type: &quot;string&quot;},{name: &quot;product_id&quot;,type: &quot;integer&quot;},{name: &quot;hight&quot;,type: &quot;raw&quot;},{name: &quot;network&quot;,type: &quot;boolean&quot;},{name: &quot;status&quot;,type:&quot;string&quot;},{name: &quot;explore_datetime&quot;,type:&quot;string&quot;},{name: &quot;latitude&quot;,type: &quot;raw&quot;},{name: &quot;longitue&quot;,type: &quot;raw&quot;},{name: &quot;type&quot;,type: &quot;string&quot;},{name: &quot;turn_off_time&quot;,type: &quot;raw&quot;},{name: &quot;turn_on_time&quot;,type: &quot;raw&quot;},{name: &quot;sn&quot;,type: &quot;string&quot;},{name: &quot;order_id&quot;,type: &quot;integer&quot;},{name: &quot;line_images&quot;,from_name:&quot;images&quot;,type: &quot;list&quot;,list_type:{ type:&quot;string&quot; }}]}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="152" name="auxiliary;index"/>
+                    <property value="true" name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#14">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{&#xA;'order_id':#[payload.order_id],&#xA;'power': #[payload.power],&#xA;'product_uom_qty': #[payload.product_uom_qty],&#xA;'name': &quot;#[payload.name]&quot;,&#xA;'product_id': #[payload.product_id],&#xA;'hight': #[payload.hight],&#xA;'line_images': #[message.outboundProperties['line_images']],&#xA;'status':&quot;#[payload.status]&quot;,&#xA;'explore_datetime':&quot;#[payload.explore_datetime]&quot;,&#xA;'latitude':#[payload.latitude],&#xA;'longitue': #[payload.longitue],&#xA;'type': &quot;#[payload.type]&quot;,&#xA;'turn_off_time':#[payload.turn_off_time],&#xA;'turn_on_time': #[payload.turn_on_time],&#xA;'sn': &quot;#[payload.sn]&quot;,&#xA;'transport': #[payload.transport],&#xA;'network': #[payload.network]&#xA;]&#xA;}" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="153" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <scope type="org.mule.tooling.ui.modules.core.scope.enricher" name="Message Enricher get images" entity-id="Message Enricher#6">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="source"/>
+                    <property value="#[message.outboundProperties['line_images']]" name="target"/>
+                    <property value="154" name="auxiliary;index"/>
+                </properties>
+                <compartment entity-id="compartment#10">
+                    <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#19">
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="Flow Reference" entity-id="Flow Reference#15">
+                            <graphicalData height="0" width="0" y="0" x="0"/>
+                            <properties>
+<property value="get_images" name="name"/>
+<property value="155" name="auxiliary;index"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                </compartment>
+            </scope>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#13">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="sale.order.line" name="model"/>
+                    <property name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-create" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="{&#xA;'order_id':#[payload.order_id],&#xA;'power': #[payload.power],&#xA;'product_uom_qty': #[payload.product_uom_qty],&#xA;'name': &quot;#[payload.name]&quot;,&#xA;'product_id': #[payload.product_id],&#xA;'hight': #[payload.hight],&#xA;'status':&quot;#[payload.status]&quot;,&#xA;'explore_datetime':&quot;#[payload.explore_datetime]&quot;,&#xA;'latitude':#[payload.latitude],&#xA;'longitue': #[payload.longitue],&#xA;'type': &quot;#[payload.type]&quot;,&#xA;'turn_off_time':#[payload.turn_off_time],&#xA;'turn_on_time': #[payload.turn_on_time],&#xA;'sn': &quot;#[payload.sn]&quot;,&#xA;'transport': #[payload.transport],&#xA;'network': #[payload.network],&#xA;'mobile_images': #[message.outboundProperties['line_images']]&#xA;}" name="data"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property name="password"/>
+                    <property value="156" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#15">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="OK" name="message"/>
+                    <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-success-integer" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="#[payload]" name="data"/>
+                    <property value="Responsemodule" name="config-ref"/>
+                    <property value="157" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="debug_point" entity-id="e080e2ed-55c7-4959-bd3a-290eeb6efa1c">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="158" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#20">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#15">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type:&quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="159" name="auxiliary;index"/>
+                    <property value="true" name="inputAsJSON"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#15">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="160" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <scope type="org.mule.tooling.ui.modules.core.scope.enricher" name="Message Enricher get line_ids" entity-id="Message Enricher#7">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload]" name="source"/>
+                    <property value="#[message.outboundProperties['line_ids']]" name="target"/>
+                    <property value="161" name="auxiliary;index"/>
+                </properties>
+                <compartment entity-id="compartment#11">
+                    <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#21">
+                        <pattern type="http://www.mulesoft.org/schema/mule/core/flow-ref" name="Flow Reference" entity-id="Flow Reference#16">
+                            <graphicalData height="0" width="0" y="0" x="0"/>
+                            <properties>
+<property value="get_line_id" name="name"/>
+<property value="162" name="auxiliary;index"/>
+                            </properties>
+                        </pattern>
+                    </lane>
+                </compartment>
+            </scope>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/logger" name="Logger" entity-id="Logger#16">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{&#xA;'install_datetime': &quot;#[payload.install_datetime]&quot;,&#xA;'install_time': #[payload.install_time],&#xA;'status': &quot;#[payload.status]&quot;,&#xA;'device_sn':&quot;#[payload.device_sn]&quot;,&#xA;'install_remark':&quot;#[payload.install_remark]&quot;&#xA;}" name="message"/>
+                    <property name="category"/>
+                    <property value="INFO" name="level"/>
+                    <property value="163" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/openerp/openerp-connector" name="Openerp" entity-id="Openerp#14">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property name=""/>
+                    <property value="sale.order.line" name="model"/>
+                    <property value="#[message.outboundProperties['auth_name']]" name="username"/>
+                    <property value="http://www.mulesoft.org/schema/mule/openerp/oe-write" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="{&#xA;'install_datetime': &quot;#[payload.install_datetime]&quot;,&#xA;'install_time': #[payload.install_time],&#xA;'status': &quot;#[payload.status]&quot;,&#xA;'device_sn':&quot;#[payload.device_sn]&quot;,&#xA;'install_remark':&quot;#[payload.install_remark]&quot;&#xA;}" name="data"/>
+                    <property value="Openerp" name="config-ref"/>
+                    <property value="#[message.outboundProperties['auth_password']]" name="password"/>
+                    <property value="164" name="auxiliary;index"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/openerp/oe-write-idss;0">
+                        <property value="#[message.outboundProperties['line_ids']]" name="ref"/>
+                        <property value="true" name="isProcessed$$$$"/>
+                        <property value="165" name="auxiliary;wrapIn"/>
+                        <property value="165" name="auxiliary;index"/>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/responsemodule/responsemodule-connector" name="Responsemodule" entity-id="Responsemodule#16">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="OK" name="message"/>
+                    <property value="http://www.mulesoft.org/schema/mule/responsemodule/to-success-string" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="#[payload]" name="data"/>
+                    <property value="Responsemodule" name="config-ref"/>
+                    <property value="166" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="get_line_id" entity-id="3402d779-04b5-4307-b5d1-199973ed8d94">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="167" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#22">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/set-payload" name="Set Payload" entity-id="Set Payload#1">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="[ #[payload.line_id] ]" name="value"/>
+                    <property value="168" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#16">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type: &quot;list&quot;,list_type: {type: &quot;integer&quot;}}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="169" name="auxiliary;index"/>
+                    <property value="true" name="inputAsJSON"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <flow SubFlow="true" name="get_images" entity-id="40041687-2fa9-4e8c-9d2b-129846c0e89e">
+        <properties>
+            <property name="processingStrategy"/>
+            <property name="processingStrategy2"/>
+            <property name="bussinessEventsLabel"/>
+            <property value="170" name="auxiliary;index"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane isChoiceOtherwiseLane="false" index="0" hadOnlyOneElement="false" entity-id="compartment-lane#23">
+            <graphicalData height="0" width="0" y="0" x="0"/>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/set-payload" name="Set Payload" entity-id="Set Payload#2">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="#[payload.line_images]" name="value"/>
+                    <property value="171" name="auxiliary;index"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/mcdatamapper/mcdatamapper-connector" name="Mcdatamapper" entity-id="Mcdatamapper#17">
+                <graphicalData height="0" width="0" y="0" x="0"/>
+                <properties>
+                    <property value="{type:&quot;raw&quot;}" name="rule"/>
+                    <property value="http://www.mulesoft.org/schema/mule/mcdatamapper/mapping" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="true" name="outputAsJson"/>
+                    <property value="Mcdatamapper" name="config-ref"/>
+                    <property value="172" name="auxiliary;index"/>
+                    <property name="inputAsJSON"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <description></description>
+</mule-configuration>
